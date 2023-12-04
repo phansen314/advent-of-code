@@ -5,15 +5,18 @@ import com.pbh.soft.common.input.Input
 import com.pbh.soft.common.input.Inputs
 import com.pbh.soft.common.input.Problem
 import com.pbh.soft.common.input.ProblemReader
-import com.pbh.soft.common.parsing.ParsingError
+import com.pbh.soft.common.parsing.ParsingLinesError
 import com.pbh.soft.day1.Day1Solver
 import com.pbh.soft.day2.Day2Solver
+import com.pbh.soft.day3.Day3Solver
 import mu.KLogging
 import kotlin.time.measureTimedValue
 
 enum class DayRunner(val day: Int, val solver: Solver) {
   Day1(1, Day1Solver),
-  Day2(2, Day2Solver);
+  Day2(2, Day2Solver),
+  Day3(3, Day3Solver)
+  ;
 
   companion object : KLogging()
 
@@ -32,7 +35,7 @@ enum class DayRunner(val day: Int, val solver: Solver) {
             }
           }
           logger.info { "RESULT: '$result' solved in $duration time" }
-        } catch (pe: ParsingError) {
+        } catch (pe: ParsingLinesError) {
           logger.error { "Unable to parse all of the input!" }
           pe.causes.forEach { (lineNum, error) ->
             logger.error {
