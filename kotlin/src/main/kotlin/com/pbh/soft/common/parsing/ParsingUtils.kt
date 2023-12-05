@@ -1,9 +1,11 @@
 package com.pbh.soft.common.parsing
 
 import cc.ekblad.konbini.*
+import com.pbh.soft.common.grid.HasColumn
+import com.pbh.soft.common.grid.SparseGrid
 
 object ParsingUtils {
-  fun <T> Parser<T>.parseLines(text: String): ParseLinesResult<T> {
+  fun <T> Parser<T>.parseLines(text: String): ParseLinesResult<List<T>> {
     val (ts, errors) = mutableListOf<T>() to mutableListOf<ParseLineError>()
     for ((lineNum, line) in text.lineSequence().withIndex()) {
       when (val pResult = parse(line)) {
@@ -15,7 +17,7 @@ object ParsingUtils {
     return ParseLinesResult(ts, errors)
   }
 
-  fun <T> Parser<T>.parseLinesIndexed(text: String): ParseLinesResult<Pair<Int, T>> {
+  fun <T> Parser<T>.parseLinesIndexed(text: String): ParseLinesResult<List<Pair<Int, T>>> {
     val (ts, errors) = mutableListOf<Pair<Int, T>>() to mutableListOf<ParseLineError>()
     for ((lineNum, line) in text.lineSequence().withIndex()) {
       when (val pResult = parse(line)) {
@@ -27,7 +29,21 @@ object ParsingUtils {
     return ParseLinesResult(ts, errors)
   }
 
-  inline fun <T, R> ParseLinesResult<T>.onSuccess(block: (List<T>) -> R): R =
+  fun <T : HasColumn> Parser<List<T>>.parseSparseGrid(text: String): ParseLinesResult<SparseGrid<T>> {
+    val errors = mutableListOf<ParseLineError>()
+    val grid = SparseGrid {
+      for ((lineNum, line) in text.lineSequence().withIndex()) {
+        when (val pResult = parse(line)) {
+          is ParserResult.Error -> errors.add(ParseLineError(lineNum, pResult))
+          is ParserResult.Ok -> pResult.result.forEach { t -> grid[lineNum, t.column] = t }
+        }
+      }
+    }
+
+    return ParseLinesResult(grid, errors)
+  }
+
+  inline fun <T, R> ParseLinesResult<T>.onSuccess(block: (T) -> R): R =
     if (errors.isNotEmpty()) throw ParsingLinesError(errors)
     else block(values)
 
@@ -38,4 +54,5 @@ object ParsingUtils {
     }
 
   fun <T> Parser<T>.withPos(): Parser<Pair<Int, T>> = parser { position to this@withPos() }
+
 }
