@@ -9,13 +9,15 @@ import com.pbh.soft.common.parsing.ParsingLinesError
 import com.pbh.soft.day1.Day1Solver
 import com.pbh.soft.day2.Day2Solver
 import com.pbh.soft.day3.Day3Solver
+import com.pbh.soft.day4.Day4Solver
 import mu.KLogging
 import kotlin.time.measureTimedValue
 
 enum class DayRunner(val day: Int, val solver: Solver) {
   Day1(1, Day1Solver),
   Day2(2, Day2Solver),
-  Day3(3, Day3Solver)
+  Day3(3, Day3Solver),
+  Day4(4, Day4Solver)
   ;
 
   companion object : KLogging()
