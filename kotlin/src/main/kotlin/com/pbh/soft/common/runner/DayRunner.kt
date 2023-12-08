@@ -12,6 +12,8 @@ import com.pbh.soft.day3.Day3Solver
 import com.pbh.soft.day4.Day4Solver
 import com.pbh.soft.day5.Day5Solver
 import com.pbh.soft.day6.Day6Solver
+import com.pbh.soft.day7.Day7Solver
+import com.pbh.soft.day8.Day8Solver
 import mu.KLogging
 import kotlin.time.measureTimedValue
 
@@ -21,7 +23,9 @@ enum class DayRunner(val day: Int, val solver: Solver) {
   Day3(3, Day3Solver),
   Day4(4, Day4Solver),
   Day5(5, Day5Solver),
-  Day6(6, Day6Solver)
+  Day6(6, Day6Solver),
+  Day7(7, Day7Solver),
+  Day8(8, Day8Solver),
   ;
 
   companion object : KLogging()

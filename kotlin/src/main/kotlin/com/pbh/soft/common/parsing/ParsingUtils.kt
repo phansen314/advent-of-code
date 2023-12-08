@@ -3,6 +3,7 @@ package com.pbh.soft.common.parsing
 import cc.ekblad.konbini.*
 import com.pbh.soft.common.grid.HasColumn
 import com.pbh.soft.common.grid.SparseGrid
+import com.pbh.soft.day7.Parsing
 
 object ParsingUtils {
   fun <T> Parser<T>.parseLines(text: String): ParseLinesResult<List<T>> {
@@ -54,5 +55,13 @@ object ParsingUtils {
     }
 
   fun <T> Parser<T>.withPos(): Parser<Pair<Int, T>> = parser { position to this@withPos() }
+
+  fun <T> parseMap(map: Map<Char, T>): Parser<T> = parser {
+    val c = char()
+    map[c] ?: fail("char '$c' not found in map!")
+  }
+
+  val intP = integer.map(Long::toInt)
+  val newlineP = string("\r\n")
 
 }
