@@ -1,5 +1,7 @@
 package com.pbh.soft.kparse
 
+import com.sun.org.apache.bcel.internal.generic.NEW
+
 typealias Index = Int
 
 fun interface KParser<T> : (State) -> Output<T> {
@@ -7,6 +9,8 @@ fun interface KParser<T> : (State) -> Output<T> {
 //  override fun invoke(state: State): Output<T> = parse(state)
 
   companion object {
+    val NEWLINE = '\n'
+
     /* ******************************************************************************************************************
      *                                  PRIMITIVE/BASIS PARSERS
      * ******************************************************************************************************************/
@@ -37,18 +41,36 @@ fun interface KParser<T> : (State) -> Output<T> {
       val (input, loc) = st
       if (loc.index >= input.length) return@KParser Output.err(loc, "Expected to read char!  At end of input", st)
       val c = input[loc.index]
-      if (c == '\n')
-        Output.ok('\n', st.copy(loc = Loc(loc.index + 1, loc.line + 1, loc.index + 1)))
-      else if (c == '\r') {
-        if (loc.index + 1 < input.length && input[loc.index + 1] == '\n')
-          Output.ok('\n', st.copy(loc = Loc(loc.index + 2, loc.line + 1, loc.index + 2)))
-        else
-          Output.ok('\n', st.copy(loc = Loc(loc.index + 1, loc.line + 1, loc.index + 1)))
-      } else
-        if (block(c))
-          Output.ok(c, st.copy(loc = loc.copy(index = loc.index + 1)))
-        else
-          Output.err(loc, "Expected to read char contained in valid!  Char did not match any expected chars", st)
+      var indexDelta = 1
+      var lineDelta = 0
+      if (c == '\n') {
+        lineDelta = 1
+      } else if (c == '\r') {
+        lineDelta = 1
+        if (loc.index + 1 < input.length && input[loc.index + 1] == '\n') {
+          indexDelta = 2
+        }
+      }
+      if (lineDelta > 0) {
+        if (block(NEWLINE)) Output.ok(NEWLINE, st.copy(loc = loc.copy(index = loc.index + indexDelta, line = loc.line + lineDelta, lineBegin = loc.index + indexDelta)))
+        else Output.err(loc, "Expected to read char satisfying block!  NEWLINE did not satisfy block", st)
+      } else {
+        if (block(c)) Output.ok(c, st.copy(loc = loc.copy(index = loc.index + 1)))
+        else Output.err(loc, "Expected to read char satisfying block!  $c did not satisfy block", st)
+      }
+      //--
+//      if (c == '\n')
+//        Output.ok('\n', st.copy(loc = Loc(loc.index + 1, loc.line + 1, loc.index + 1)))
+//      else if (c == '\r') {
+//        if (loc.index + 1 < input.length && input[loc.index + 1] == '\n')
+//          Output.ok('\n', st.copy(loc = Loc(loc.index + 2, loc.line + 1, loc.index + 2)))
+//        else
+//          Output.ok('\n', st.copy(loc = Loc(loc.index + 1, loc.line + 1, loc.index + 1)))
+//      } else
+//        if (block(c))
+//          Output.ok(c, st.copy(loc = loc.copy(index = loc.index + 1)))
+//        else
+//          Output.err(loc, "Expected to read char contained in valid!  Char did not match any expected chars", st)
     }
 
     fun <T> chr(mapping: Map<Char, T>) = KParser<T> { st ->
@@ -86,6 +108,10 @@ fun interface KParser<T> : (State) -> Output<T> {
       if (value == null) Output.err(st.loc, "Expected to match pattern: $pattern at ${st.loc.index}!", st)
       else Output.ok(value, st.copy(loc = st.loc.copy(index = st.loc.index + value.length)))
     }
+
+    val int = rgx(Regex("[+\\-]?[0-9]+")).map(String::toInt)
+    val decimal = rgx(Regex("[+\\-]?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+\\-]?\\d+)?")).map(String::toDouble)
+    val bigDecimal = rgx(Regex("[+\\-]?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+\\-]?\\d+)?")).map(String::toBigDecimal)
 
     /* ******************************************************************************************************************
      *                                  META/COMBINATOR PARSERS

@@ -4,16 +4,12 @@ import com.pbh.soft.common.Solver
 import com.pbh.soft.day8.CyclingIterator.Companion.cycle
 import com.pbh.soft.day8.Instruction.Companion.charReprXInstruction
 import com.pbh.soft.day8.Parsing.networkP
-import com.pbh.soft.kparse.KParser
 import com.pbh.soft.kparse.KParser.Companion.chr
-import com.pbh.soft.kparse.KParser.Companion.letter
 import com.pbh.soft.kparse.KParser.Companion.many
 import com.pbh.soft.kparse.KParser.Companion.manySep
 import com.pbh.soft.kparse.KParser.Companion.newline
 import com.pbh.soft.kparse.KParser.Companion.parser
-import com.pbh.soft.kparse.KParser.Companion.rgx
 import com.pbh.soft.kparse.KParser.Companion.start
-import com.pbh.soft.kparse.KParser.Companion.ws
 import com.pbh.soft.kparse.Result
 import com.pbh.soft.kparse.State
 import mu.KLogging

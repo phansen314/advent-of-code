@@ -4,6 +4,10 @@ import cc.ekblad.konbini.*
 import com.pbh.soft.common.grid.HasColumn
 import com.pbh.soft.common.grid.SparseGrid
 import com.pbh.soft.day7.Parsing
+import com.pbh.soft.kparse.KParser
+import com.pbh.soft.kparse.Output
+import com.pbh.soft.kparse.Result
+import com.pbh.soft.kparse.State
 
 object ParsingUtils {
   fun <T> Parser<T>.parseLines(text: String): ParseLinesResult<List<T>> {
@@ -43,6 +47,12 @@ object ParsingUtils {
 
     return ParseLinesResult(grid, errors)
   }
+
+  inline fun <T, R> KParser<T>.onSuccess(text: String, block: (T) -> R): R =
+    when (val res = this(State(text)).result) {
+      is Result.Err -> throw IllegalStateException("parsing failed at ${res.loc} due to ${res.message}")
+      is Result.Ok -> block(res.value)
+    }
 
   inline fun <T, R> ParseLinesResult<T>.onSuccess(block: (T) -> R): R =
     if (errors.isNotEmpty()) throw ParsingLinesError(errors)
