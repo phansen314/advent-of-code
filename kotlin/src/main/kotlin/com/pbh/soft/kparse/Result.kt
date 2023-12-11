@@ -14,7 +14,7 @@ sealed class Result<out A> {
    * @property message error message
    */
   data class Err(
-    val loc: Loc,
+    val position: Position,
     val message: String
   ) : Result<Nothing>()
 

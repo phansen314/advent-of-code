@@ -3,9 +3,7 @@ package com.pbh.soft.common.parsing
 import cc.ekblad.konbini.*
 import com.pbh.soft.common.grid.HasColumn
 import com.pbh.soft.common.grid.SparseGrid
-import com.pbh.soft.day7.Parsing
 import com.pbh.soft.kparse.KParser
-import com.pbh.soft.kparse.Output
 import com.pbh.soft.kparse.Result
 import com.pbh.soft.kparse.State
 
@@ -50,7 +48,7 @@ object ParsingUtils {
 
   inline fun <T, R> KParser<T>.onSuccess(text: String, block: (T) -> R): R =
     when (val res = this(State(text)).result) {
-      is Result.Err -> throw IllegalStateException("parsing failed at ${res.loc} due to ${res.message}")
+      is Result.Err -> throw IllegalStateException("parsing failed at ${res.position} due to ${res.message}")
       is Result.Ok -> block(res.value)
     }
 

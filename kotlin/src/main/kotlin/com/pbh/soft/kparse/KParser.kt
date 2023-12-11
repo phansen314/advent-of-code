@@ -1,7 +1,5 @@
 package com.pbh.soft.kparse
 
-import com.sun.org.apache.bcel.internal.generic.NEW
-
 typealias Index = Int
 
 fun interface KParser<T> : (State) -> Output<T> {
@@ -15,20 +13,20 @@ fun interface KParser<T> : (State) -> Output<T> {
      *                                  PRIMITIVE/BASIS PARSERS
      * ******************************************************************************************************************/
     fun <T> ok(t: T) = KParser { Output.ok(t, it) }
-    fun err(message: String) = KParser<Nothing> { throw ErrException(Result.Err(it.loc, message)) }
+    fun err(message: String) = KParser<Nothing> { throw ErrException(Result.Err(it.position, message)) }
 
 
     /* ******************************************************************************************************************
      *                                  POSITION PARSERS
      * ******************************************************************************************************************/
-    val loc = KParser { Output.ok(it.loc, it) }
+    val pos = KParser { Output.ok(it.position, it) }
     val start = KParser {
-      if (it.loc.index == 0) Output.ok(Unit, it)
-      else Output.err(it.loc, "Expected to be at start of input", it)
+      if (it.position.index == 0) Output.ok(Unit, it)
+      else Output.err(it.position, "Expected to be at start of input", it)
     }
     val end = KParser {
-      if (it.loc.index == it.input.length) Output.ok(Unit, it)
-      else Output.err(it.loc, "Expected to be at end of input", it)
+      if (it.position.index == it.input.length) Output.ok(Unit, it)
+      else Output.err(it.position, "Expected to be at end of input", it)
     }
 
     /* ******************************************************************************************************************
@@ -52,10 +50,10 @@ fun interface KParser<T> : (State) -> Output<T> {
         }
       }
       if (lineDelta > 0) {
-        if (block(NEWLINE)) Output.ok(NEWLINE, st.copy(loc = loc.copy(index = loc.index + indexDelta, line = loc.line + lineDelta, lineBegin = loc.index + indexDelta)))
+        if (block(NEWLINE)) Output.ok(NEWLINE, st.copy(position = loc.copy(index = loc.index + indexDelta, line = loc.line + lineDelta, lineBegin = loc.index + indexDelta)))
         else Output.err(loc, "Expected to read char satisfying block!  NEWLINE did not satisfy block", st)
       } else {
-        if (block(c)) Output.ok(c, st.copy(loc = loc.copy(index = loc.index + 1)))
+        if (block(c)) Output.ok(c, st.copy(position = loc.copy(index = loc.index + 1)))
         else Output.err(loc, "Expected to read char satisfying block!  $c did not satisfy block", st)
       }
       //--
@@ -80,7 +78,7 @@ fun interface KParser<T> : (State) -> Output<T> {
         is Result.Err -> output as Output<T>
         is Result.Ok -> mapping[output.result.value]
           ?.let { Output.ok(it, output.next) }
-          ?: Output.err(st.loc, "Expected a Char to exist in mapping!", st)
+          ?: Output.err(st.position, "Expected a Char to exist in mapping!", st)
       }
     }
 
@@ -104,9 +102,9 @@ fun interface KParser<T> : (State) -> Output<T> {
     val ascii = chr { it.lowercaseChar() in asciiLowerLetter }
 
     fun rgx(pattern: Regex) = KParser { st ->
-      val value = pattern.matchAt(st.input, st.loc.index)?.value
-      if (value == null) Output.err(st.loc, "Expected to match pattern: $pattern at ${st.loc.index}!", st)
-      else Output.ok(value, st.copy(loc = st.loc.copy(index = st.loc.index + value.length)))
+      val value = pattern.matchAt(st.input, st.position.index)?.value
+      if (value == null) Output.err(st.position, "Expected to match pattern: $pattern at ${st.position.index}!", st)
+      else Output.ok(value, st.copy(position = st.position.copy(index = st.position.index + value.length)))
     }
 
     val int = rgx(Regex("[+\\-]?[0-9]+")).map(String::toInt)
@@ -122,7 +120,7 @@ fun interface KParser<T> : (State) -> Output<T> {
       when (output.result) {
         is Result.Err -> output
         is Result.Ok -> if (block(output.result.value)) output else Output.err(
-          st.loc,
+          st.position,
           "Expected sat named $name to be satisfied by value!",
           st
         )
@@ -147,12 +145,38 @@ fun interface KParser<T> : (State) -> Output<T> {
       }
     }
 
+    fun <T> any(p: KParser<T>, vararg parsers: KParser<T>) = KParser<T> { st ->
+      var output = p(st)
+      if (output.result is Result.Ok) {
+        return@KParser output
+      }
+      for (p in parsers) {
+        output = p(st)
+        if (output.result is Result.Ok) {
+          return@KParser output
+        }
+      }
+
+      Output.err(st.position, "any failed!", st)
+    }
+
+    fun <T> KParser<T>.opt() = KParser { st ->
+      val output = this(st)
+      when (output.result) {
+        is Result.Err -> Output.ok(null, st)
+        is Result.Ok -> output
+      }
+    }
+
     fun <T, U> KParser<T>.then(other: KParser<U>) = flatMap { t -> other.map { u -> t to u } }
+
+    fun <T> KParser<T>.keepL(other: KParser<*>) = flatMap { t -> other.map { t } }
+    fun <T> KParser<*>.keepR(other: KParser<T>) = flatMap { other.map { it } }
 
     inline fun <T> parser(crossinline block: KParserDsl.() -> T): KParser<T> = KParser<T> { state ->
       val dsl = KParserDsl(state)
       val result = try {
-        Result.Ok(dsl.run(block))
+        Result.Ok(dsl.block())
       } catch (e: ErrException) {
         e.err
       }

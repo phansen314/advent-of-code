@@ -1,19 +1,18 @@
 package com.pbh.soft.kparse
 
-import com.pbh.soft.kparse.KParser.Companion.asciiLowerLetter
-import com.pbh.soft.kparse.KParser.Companion.asciiUpperLetter
-import com.pbh.soft.kparse.KParser.Companion.hexDigit
-import com.pbh.soft.kparse.KParser.Companion.hexLetterLower
 import com.pbh.soft.kparse.KParser.Companion.many
 import com.pbh.soft.kparse.KParser.Companion.manySep
 import com.pbh.soft.kparse.KParser.Companion.map
-import com.pbh.soft.kparse.KParser.Companion.octalDigit
+import com.pbh.soft.kparse.KParser.Companion.opt
 import com.pbh.soft.kparse.KParser.Companion.sat
 import com.pbh.soft.kparse.KParser.Companion.then
 
 class KParserDsl(initial: State) {
   var state: State = initial
     private set
+
+  fun isDone() = state.isDone()
+  fun isNotDone() = state.isNotDone()
 
   operator fun <T> KParser<T>.invoke(): T {
     val (result, next) = this(state)
@@ -28,7 +27,7 @@ class KParserDsl(initial: State) {
 
   infix fun <T, U> KParser<T>.to(other: KParser<U>) = this.then(other)
 
-  fun err(message: String): Nothing = throw ErrException(Result.Err(state.loc, message))
+  fun err(message: String): Nothing = throw ErrException(Result.Err(state.position, message))
 
   fun chr(c: Char) = KParser.chr(c)()
   inline fun chr(crossinline block: (Char) -> Boolean) = KParser.chr(block)()
@@ -56,4 +55,5 @@ class KParserDsl(initial: State) {
   fun <T, U> pair(parser: KParser<T>, other: KParser<U>) = parser.then(other)()
   fun <T> many(parser: KParser<T>, min: Int = 0) = parser.many(min)()
   fun <T, U> manySep(parser: KParser<T>, separator: KParser<U>, min: Int = 0) = parser.manySep(separator, min)()
+  fun <T> opt(parser: KParser<T>) = parser.opt()()
 }

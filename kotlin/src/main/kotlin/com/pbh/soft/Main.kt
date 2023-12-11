@@ -1,5 +1,7 @@
 package com.pbh.soft
 
+import com.pbh.soft.common.runner.DayRunner
+import com.pbh.soft.common.runner.DayRunner.Day10
 import com.pbh.soft.common.runner.DayRunner.Day9
 import com.pbh.soft.common.runner.Part
 import com.pbh.soft.common.runner.Part.P1
@@ -19,6 +21,8 @@ class Main : Runnable {
 //    Day6.run(P2.example(), P2.problem())
 //    Day7.run(P1.problem(), P2.problem())
 //    Day8.run(P2.example(), P2.other("other"), P2.problem())
-    Day9.run(P2.example(), P2.problem())
+//    Day9.run(P2.example(), P2.problem())
+//    Day10.run(P2.other("open"), P2.other("closed"), P2.other("medium"), P2.example(), P2.problem())
+    Day10.run(P2.problem())
   }
 }
