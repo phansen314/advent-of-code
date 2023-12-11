@@ -1,5 +1,6 @@
 package com.pbh.soft.kparse
 
+import com.pbh.soft.kparse.KParser.Companion.keepL
 import com.pbh.soft.kparse.KParser.Companion.many
 import com.pbh.soft.kparse.KParser.Companion.manySep
 import com.pbh.soft.kparse.KParser.Companion.map
@@ -56,4 +57,5 @@ class KParserDsl(initial: State) {
   fun <T> many(parser: KParser<T>, min: Int = 0) = parser.many(min)()
   fun <T, U> manySep(parser: KParser<T>, separator: KParser<U>, min: Int = 0) = parser.manySep(separator, min)()
   fun <T> opt(parser: KParser<T>) = parser.opt()()
+  fun <T> keepL(parser: KParser<T>, other: KParser<*>) = parser.keepL(other)()
 }
