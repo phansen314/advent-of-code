@@ -13,10 +13,11 @@ import com.pbh.soft.common.parsing.ParsingUtils.onSuccess
 import com.pbh.soft.day10.Parsing.sketchP
 import com.pbh.soft.day10.Pipe.*
 import com.pbh.soft.day10.Tile.*
-import com.pbh.soft.kparse.KParser.Companion.any
+import com.pbh.soft.kparse.KParser
 import com.pbh.soft.kparse.KParser.Companion.chr
 import com.pbh.soft.kparse.KParser.Companion.map
 import com.pbh.soft.kparse.KParser.Companion.newline
+import com.pbh.soft.kparse.KParser.Companion.or
 import com.pbh.soft.kparse.KParser.Companion.parser
 import com.pbh.soft.kparse.KParser.Companion.pos
 import com.pbh.soft.kparse.KParser.Companion.then
@@ -168,10 +169,10 @@ sealed class Tile {
 
 object Parsing {
   private val locP = pos.map { Loc(r = it.line, c = it.column) }
-  val pipeP = locP.then(chr(Pipe.entries.associateBy(Pipe::char))).map { (loc, pipe) -> PipeTile(loc, pipe) }
-  val startP = locP.then(chr('S')).map { (loc, _) -> Start(loc) }
-  val groundP = locP.then(chr('.')).map { (loc, _) -> Ground(loc) }
-  val tileP = any<Tile>(groundP, startP, pipeP)
+  val pipeP: KParser<Tile> = locP.then(chr(Pipe.entries.associateBy(Pipe::char))).map { (loc, pipe) -> PipeTile(loc, pipe) }
+  val startP: KParser<Tile> = locP.then(chr('S')).map { (loc, _) -> Start(loc) }
+  val groundP: KParser<Tile> = locP.then(chr('.')).map { (loc, _) -> Ground(loc) }
+  val tileP = groundP.or(startP, pipeP)
   val sketchP = parser {
     var maxR: Row = 0
     var maxC: Col = -1

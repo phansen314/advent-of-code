@@ -2,10 +2,15 @@ package com.pbh.soft.common.parsing
 
 import cc.ekblad.konbini.*
 import com.pbh.soft.common.grid.HasColumn
+import com.pbh.soft.common.grid.Loc
+import com.pbh.soft.common.grid.MutableDenseGrid
 import com.pbh.soft.common.grid.SparseGrid
 import com.pbh.soft.kparse.KParser
+import com.pbh.soft.kparse.KParser.Companion.map
 import com.pbh.soft.kparse.Result
 import com.pbh.soft.kparse.State
+import java.util.ArrayList
+import kotlin.math.max
 
 object ParsingUtils {
   fun <T> Parser<T>.parseLines(text: String): ParseLinesResult<List<T>> {
@@ -71,5 +76,23 @@ object ParsingUtils {
 
   val intP = integer.map(Long::toInt)
   val newlineP = string("\r\n")
+  val locP = KParser.pos.map { Loc(r = it.line, c = it.column) }
+
+  fun <T> gridP(colParser: KParser<T>) = KParser.parser {
+    var (maxR, maxC) = 0 to 0
+    val rows = ArrayList<ArrayList<T>>()
+    while (isNotDone()) {
+      val cols = ArrayList<T>()
+      for ((c, t) in many(colParser).withIndex()) {
+        cols.add(t)
+        maxC = max(maxC, c)
+      }
+      opt(KParser.newline)
+      rows.add(cols)
+      maxR++
+    }
+
+    MutableDenseGrid(rows)
+  }
 
 }

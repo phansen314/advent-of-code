@@ -8,6 +8,7 @@ import com.pbh.soft.common.input.ProblemReader
 import com.pbh.soft.common.parsing.ParsingLinesError
 import com.pbh.soft.day1.Day1Solver
 import com.pbh.soft.day10.Day10Solver
+import com.pbh.soft.day11.Day11Solver
 import com.pbh.soft.day2.Day2Solver
 import com.pbh.soft.day3.Day3Solver
 import com.pbh.soft.day4.Day4Solver
@@ -30,6 +31,7 @@ enum class DayRunner(val day: Int, val solver: Solver) {
   Day8(8, Day8Solver),
   Day9(9, Day9Solver),
   Day10(10, Day10Solver),
+  Day11(11, Day11Solver),
   ;
 
   companion object : KLogging()

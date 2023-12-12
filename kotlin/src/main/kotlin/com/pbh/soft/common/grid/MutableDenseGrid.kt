@@ -1,8 +1,18 @@
 package com.pbh.soft.common.grid
 
-class MutableDenseGrid<T>(private val rows: ArrayList<ArrayList<T>>) {
+class MutableDenseGrid<T>(private val rows: ArrayList<ArrayList<T>>) : Iterable<Pair<Loc, T>> {
   val rSize: Int = rows.size
   val cSize: Int = rows[0].size
+  val rIndices = 0..<rSize
+  val cIndices = 0..<cSize
+
+  override fun iterator(): Iterator<Pair<Loc, T>> = iterator {
+    for (r in 0..<rSize) {
+      for (c in 0..<cSize) {
+        yield(Loc(r, c) to this@MutableDenseGrid[r, c]!!)
+      }
+    }
+  }
 
   operator fun set(row: Row, pairs: Iterable<Pair<Col, T>>) {
     pairs.forEach { rows[row][it.first] = it.second }

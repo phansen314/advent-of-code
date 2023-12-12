@@ -145,8 +145,8 @@ fun interface KParser<T> : (State) -> Output<T> {
       }
     }
 
-    fun <T> any(p: KParser<T>, vararg parsers: KParser<T>) = KParser<T> { st ->
-      var output = p(st)
+    fun <T> KParser<T>.or(vararg parsers: KParser<T>) = KParser<T> { st ->
+      var output = this(st)
       if (output.result is Result.Ok) {
         return@KParser output
       }
