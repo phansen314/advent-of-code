@@ -56,19 +56,6 @@ fun interface KParser<T> : (State) -> Output<T> {
         if (block(c)) Output.ok(c, st.copy(position = loc.copy(index = loc.index + 1)))
         else Output.err(loc, "Expected to read char satisfying block!  $c did not satisfy block", st)
       }
-      //--
-//      if (c == '\n')
-//        Output.ok('\n', st.copy(loc = Loc(loc.index + 1, loc.line + 1, loc.index + 1)))
-//      else if (c == '\r') {
-//        if (loc.index + 1 < input.length && input[loc.index + 1] == '\n')
-//          Output.ok('\n', st.copy(loc = Loc(loc.index + 2, loc.line + 1, loc.index + 2)))
-//        else
-//          Output.ok('\n', st.copy(loc = Loc(loc.index + 1, loc.line + 1, loc.index + 1)))
-//      } else
-//        if (block(c))
-//          Output.ok(c, st.copy(loc = loc.copy(index = loc.index + 1)))
-//        else
-//          Output.err(loc, "Expected to read char contained in valid!  Char did not match any expected chars", st)
     }
 
     fun <T> chr(mapping: Map<Char, T>) = KParser<T> { st ->

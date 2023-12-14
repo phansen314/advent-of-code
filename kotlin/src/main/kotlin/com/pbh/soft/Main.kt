@@ -22,6 +22,7 @@ class Main : Runnable {
 //    Day8.run(P2.example(), P2.other("other"), P2.problem())
 //    Day9.run(P2.example(), P2.problem())
 //    Day10.run(P2.other("open"), P2.other("closed"), P2.other("medium"), P2.example(), P2.problem())
-    Day11.run(P1.problem(), P2.problem())
+//    Day11.run(P1.problem(), P2.problem())
+    Day12.run(P2.problem())
   }
 }
