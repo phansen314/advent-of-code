@@ -83,7 +83,9 @@ object ParsingUtils {
     val rows = ArrayList<ArrayList<T>>()
     while (isNotDone()) {
       val cols = ArrayList<T>()
-      for ((c, t) in many(colParser).withIndex()) {
+      val columns = many(colParser)
+      if (columns.isEmpty()) break
+      for ((c, t) in columns.withIndex()) {
         cols.add(t)
         maxC = max(maxC, c)
       }
