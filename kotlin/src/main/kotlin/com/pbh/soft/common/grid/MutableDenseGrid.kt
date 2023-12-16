@@ -30,11 +30,15 @@ class MutableDenseGrid<T>(private val rows: ArrayList<ArrayList<T>>) : Iterable<
     set(loc.r, loc.c, t)
   }
 
-  operator fun get(row: Row, col: Col): T? =
+  operator fun get(row: Row, col: Col): T = getOrNull(row, col) ?: throw IndexOutOfBoundsException("0 <= $row < $rSize and 0 <= $col < $cSize must hold true!")
+
+  operator fun get(loc: Loc): T = get(loc.r, loc.c)
+
+  fun getOrNull(row: Row, col: Col): T? =
     if (row in 0..<rSize && col in 0..<cSize) rows[row][col]
     else null
 
-  operator fun get(loc: Loc): T? = get(loc.r, loc.c)
+  fun getOrNull(loc: Loc): T? = get(loc.r, loc.c)
 
   inline fun findAll(crossinline predicate: (T) -> Boolean): Sequence<Pair<Loc, T>> =
     (0..<rSize).asSequence()
