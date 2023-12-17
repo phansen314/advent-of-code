@@ -13,6 +13,7 @@ import com.pbh.soft.day12.Day12Solver
 import com.pbh.soft.day13.Day13Solver
 import com.pbh.soft.day14.Day14Solver
 import com.pbh.soft.day15.Day15Solver
+import com.pbh.soft.day16.Day16Solver
 import com.pbh.soft.day2.Day2Solver
 import com.pbh.soft.day3.Day3Solver
 import com.pbh.soft.day4.Day4Solver
@@ -40,6 +41,7 @@ enum class DayRunner(val day: Int, val solver: Solver) {
   Day13(13, Day13Solver),
   Day14(14, Day14Solver),
   Day15(15, Day15Solver),
+  Day16(16, Day16Solver),
   ;
 
   companion object : KLogging()

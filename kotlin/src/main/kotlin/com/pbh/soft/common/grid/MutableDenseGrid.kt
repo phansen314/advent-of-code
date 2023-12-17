@@ -6,6 +6,8 @@ class MutableDenseGrid<T>(private val rows: ArrayList<ArrayList<T>>) : Iterable<
   val rIndices = 0..<rSize
   val cIndices = 0..<cSize
 
+  fun isInBounds(loc: Loc) = loc.r in 0..<rSize && loc.c in 0..<cSize
+
   override fun iterator(): Iterator<Pair<Loc, T>> = iterator {
     for (r in 0..<rSize) {
       for (c in 0..<cSize) {

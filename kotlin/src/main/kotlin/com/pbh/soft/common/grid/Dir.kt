@@ -7,10 +7,14 @@ package com.pbh.soft.common.grid
  *     |
  *     S
  */
-enum class Dir(val dr: Int, val dc: Int) {
-  NW(-1, -1), N(-1, 0), NE(-1, 1),
-  W(0, -1), E(0, 1),
-  SW(1, -1), S(1, 0), SE(1, 1);
+enum class Dir(val dr: Int, val dc: Int, val bitIndex: Int) {
+  NW(-1, -1, 0), N(-1, 0, 1), NE(-1, 1, 2),
+  W(0, -1, 3), E(0, 1, 4),
+  SW(1, -1, 5), S(1, 0, 6), SE(1, 1, 7);
+
+  val bitMask: Int = 1 shl bitIndex
+  val isVerticalAxis = dc == 0
+  val isHorizontalAxis = dr == 0
 
   fun ray(
     from: Loc,
