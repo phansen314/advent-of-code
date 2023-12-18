@@ -31,9 +31,9 @@ enum class Dir(val dr: Int, val dc: Int, val bitIndex: Int) {
   }
 
   companion object {
-    val axisDirs = listOf(N, S, E, W)
-    val verticalAxisDirs = listOf(N, S)
-    val horizontalAxisDirs = listOf(E, W)
+    val axisDirs = linkedSetOf(N, S, E, W)
+    val verticalAxisDirs = linkedSetOf(N, S)
+    val horizontalAxisDirs = linkedSetOf(E, W)
 
     fun Dir.opposite(): Dir = when (this) {
       NW -> SE
