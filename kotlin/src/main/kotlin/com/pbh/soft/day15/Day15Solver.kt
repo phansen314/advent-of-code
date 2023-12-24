@@ -2,12 +2,11 @@ package com.pbh.soft.day15
 
 import com.pbh.soft.common.Solver
 import com.pbh.soft.common.parsing.ParsingUtils.onSuccess
-import com.pbh.soft.day15.Day15Solver.hash
 import com.pbh.soft.day15.Op.Del
 import com.pbh.soft.day15.Op.Ins
 import com.pbh.soft.kparse.KParser
 import com.pbh.soft.kparse.KParser.Companion.chr
-import com.pbh.soft.kparse.KParser.Companion.int
+import com.pbh.soft.kparse.KParser.Companion.intNum
 import com.pbh.soft.kparse.KParser.Companion.keepR
 import com.pbh.soft.kparse.KParser.Companion.manySep
 import com.pbh.soft.kparse.KParser.Companion.map
@@ -104,7 +103,7 @@ class Step(val label: Label, val op: Op) {
 
 object Parsing {
   val delOpP: KParser<Op> = chr('-').map { Del }
-  val insOpP: KParser<Op> = chr('=').keepR(int).map { Ins(it) }
+  val insOpP: KParser<Op> = chr('=').keepR(intNum).map { Ins(it) }
   val opP = delOpP.or(insOpP)
   val stepP = parser {
     val label = Regex("[^,=-]*")()

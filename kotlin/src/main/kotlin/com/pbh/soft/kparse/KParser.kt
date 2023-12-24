@@ -94,9 +94,15 @@ fun interface KParser<T> : (State) -> Output<T> {
       else Output.ok(value, st.copy(position = st.position.copy(index = st.position.index + value.length)))
     }
 
-    val int = rgx(Regex("[+\\-]?[0-9]+")).map(String::toInt)
-    val decimal = rgx(Regex("[+\\-]?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+\\-]?\\d+)?")).map(String::toDouble)
-    val bigDecimal = rgx(Regex("[+\\-]?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+\\-]?\\d+)?")).map(String::toBigDecimal)
+    fun str(s: String) = KParser { st ->
+      if (!st.input.startsWith(s, st.position.index)) Output.err(st.position, "Expected to match String: $s at ${st.position.index}!", st)
+      else Output.ok(s, st.copy(position = st.position.copy(index = st.position.index + s.length)))
+    }
+
+    val hexNum = rgx(Regex("[0-9a-fA-F]+")).map { it.toInt(16) }
+    val intNum = rgx(Regex("[+\\-]?[0-9]+")).map(String::toInt)
+    val decimalNum = rgx(Regex("[+\\-]?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+\\-]?\\d+)?")).map(String::toDouble)
+    val bigDecimalNum = rgx(Regex("[+\\-]?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+\\-]?\\d+)?")).map(String::toBigDecimal)
 
     /* ******************************************************************************************************************
      *                                  META/COMBINATOR PARSERS
@@ -159,6 +165,12 @@ fun interface KParser<T> : (State) -> Output<T> {
 
     fun <T> KParser<T>.keepL(other: KParser<*>) = flatMap { t -> other.map { t } }
     fun <T> KParser<*>.keepR(other: KParser<T>) = flatMap { other.map { it } }
+    fun <T> KParser<T>.bracket(left: KParser<*>, right: KParser<*>) = parser {
+      left()
+      val t = this@bracket()
+      right()
+      t
+    }
 
     inline fun <T> parser(crossinline block: KParserDsl.() -> T): KParser<T> = KParser<T> { state ->
       val dsl = KParserDsl(state)
@@ -200,6 +212,14 @@ fun interface KParser<T> : (State) -> Output<T> {
 
       if (values.size >= min) ManySep(values, separators)
       else err("Expected at least $min occurrences of value KParser!")
+    }
+  }
+
+  object Nums {
+    object Hex {
+      val charRgx = "[0-9a-fA-F]"
+      val hexNumStr = rgx(Regex("$charRgx+"))
+      val hexNum = hexNumStr.map { it.toInt(16) }
     }
   }
 }

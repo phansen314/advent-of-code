@@ -1,5 +1,6 @@
 package com.pbh.soft.kparse
 
+import com.pbh.soft.kparse.KParser.Companion.bracket
 import com.pbh.soft.kparse.KParser.Companion.keepL
 import com.pbh.soft.kparse.KParser.Companion.many
 import com.pbh.soft.kparse.KParser.Companion.manySep
@@ -51,6 +52,7 @@ class KParserDsl(initial: State) {
   fun Char.p() = KParser.chr { it == this }
   fun String.anyChar() = KParser.chr { it in this }
   fun String.noChar() = KParser.chr { it !in this }
+  fun str(s: String) = KParser.str(s)()
 
   inline fun <T> sat(parser: KParser<T>, name: String = "sat", crossinline block: (T) -> Boolean) = parser.sat(name, block)()
   inline fun <T, U> map(parser: KParser<T>, crossinline block: (T) -> U) = parser.map(block)()
@@ -60,4 +62,6 @@ class KParserDsl(initial: State) {
   fun <T> any(parser: KParser<T>, vararg others: KParser<T>) = parser.or(*others)()
   fun <T> opt(parser: KParser<T>) = parser.opt()()
   fun <T> keepL(parser: KParser<T>, other: KParser<*>) = parser.keepL(other)()
+  fun <T> bracket(left: String, parser: KParser<T>, right: String) = parser.bracket(KParser.str(left), KParser.str(right))()
+  fun <T> bracket(left: KParser<*>, parser: KParser<T>, right: KParser<*>) = parser.bracket(left, right)()
 }

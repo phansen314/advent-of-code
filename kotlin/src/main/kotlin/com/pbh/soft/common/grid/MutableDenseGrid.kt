@@ -6,6 +6,20 @@ class MutableDenseGrid<T>(private val rows: ArrayList<ArrayList<T>>) : Iterable<
   val rIndices = 0..<rSize
   val cIndices = 0..<cSize
 
+  companion object {
+    operator fun <T> invoke(rSize: Int, cSize: Int, block: (Row, Col) -> T): MutableDenseGrid<T> {
+      val rows = ArrayList<ArrayList<T>>(rSize)
+      for (r in 0..<rSize) {
+        val cols = ArrayList<T>(cSize)
+        for (c in 0..<cSize) {
+          cols.add(block(r, c))
+        }
+        rows.add(cols)
+      }
+      return MutableDenseGrid(rows)
+    }
+  }
+
   fun isInBounds(loc: Loc) = loc.r in 0..<rSize && loc.c in 0..<cSize
 
   override fun iterator(): Iterator<Pair<Loc, T>> = iterator {

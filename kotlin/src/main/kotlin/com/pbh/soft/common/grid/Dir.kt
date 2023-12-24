@@ -16,6 +16,8 @@ enum class Dir(val dr: Int, val dc: Int, val bitIndex: Int) {
   val isVerticalAxis = dc == 0
   val isHorizontalAxis = dr == 0
 
+  operator fun times(n: Int): Loc = Loc(n * dr, n * dc)
+
   fun ray(
     from: Loc,
     minR: Row = Int.MIN_VALUE,

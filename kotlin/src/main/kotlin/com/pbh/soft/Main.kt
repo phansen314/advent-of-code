@@ -12,6 +12,6 @@ fun main(args: Array<String>) {
 
 class Main : Runnable {
   override fun run() {
-    Day17.run(P2.example(), P2.problem())
+    Day18.run(P2.problem())
   }
 }

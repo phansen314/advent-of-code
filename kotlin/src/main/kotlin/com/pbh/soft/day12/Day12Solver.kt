@@ -3,7 +3,7 @@ package com.pbh.soft.day12
 import com.pbh.soft.common.Solver
 import com.pbh.soft.common.parsing.ParsingUtils.onSuccess
 import com.pbh.soft.kparse.KParser.Companion.chr
-import com.pbh.soft.kparse.KParser.Companion.int
+import com.pbh.soft.kparse.KParser.Companion.intNum
 import com.pbh.soft.kparse.KParser.Companion.keepL
 import com.pbh.soft.kparse.KParser.Companion.manySep
 import com.pbh.soft.kparse.KParser.Companion.map
@@ -116,7 +116,7 @@ data class Record(val condition: String, val groups: List<GroupSize>)
 data class Problem(val records: List<Record>)
 
 object Parsing {
-  val groupsP = int.manySep(chr(',')).map { it.values }
+  val groupsP = intNum.manySep(chr(',')).map { it.values }
   val conditionP = rgx(Regex("[.#?]*"))
   val recordP = conditionP.keepL(ws).then(groupsP).map { (condition, groups) -> Record(condition, groups) }
   val problemP = recordP.manySep(newline.opt()).map { Problem(it.values) }
